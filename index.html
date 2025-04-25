@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SunTracker</title>
+    <style>
+        :root {
+            --main-color: #e83f6f;
+            --bg-color: #2a1a1f;
+            --text-color: #ffffff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(320deg, #2a1a1f 0%, #4a2b35 50%, #6a3f4b 100%);
+            animation: skyAnimation 20s infinite alternate;
+        }
+
+        @keyframes skyAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .decorative {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .flower {
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 30% 30%, #ff69b4, #e83f6f);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: float 8s infinite ease-in-out;
+        }
+
+        .cloud {
+            width: 100px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            filter: blur(2px);
+            animation: cloudFloat 20s infinite linear;
+        }
+
+        .star {
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        @keyframes cloudFloat {
+            from { transform: translateX(-110%); }
+            to { transform: translateX(110%); }
+        }
+
+        @keyframes twinkle {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+
+        .sun-animation {
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(#ffd700, #ff8c00);
+            border-radius: 50%;
+            margin: 20px auto;
+            position: relative;
+            animation: sunOrbit 20s infinite linear;
+            box-shadow: 0 0 50px rgba(255,140,0,0.5);
+        }
+
+        @keyframes sunOrbit {
+            0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: scale(1.02);
+        }
+
+        button {
+            background: var(--main-color);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s all ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: rotate(45deg);
+            animation: buttonShine 3s infinite;
+        }
+
+        @keyframes buttonShine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--main-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .location-form {
+            text-align: center;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .location-form h1 {
+            color: #fff;
+            margin-bottom: 30px;
+            font-size: 1.8em;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-group {
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .location-input {
+            width: 100%;
+            padding: 15px 0px;
+            border: 2px solid rgba(232, 63, 111, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .location-input:focus {
+            outline: none;
+            border-color: #e83f6f;
+            box-shadow: 0 0 15px rgba(232, 63, 111, 0.2);
+        }
+
+        .location-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .location-btn {
+            padding: 16px 30px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(232,63,111,0.9), rgba(232,63,111,0.7));
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .location-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(232,63,111,0.3);
+        }
+
+        .divider {
+            margin: 25px 0;
+            color: rgba(255,255,255,0.3);
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin: auto;
+        }
+
+        .divider-text {
+            padding: 0 15px;
+        }
+
+        #errorMessage {
+            color: #ff4d4d;
+            display: none;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 480px) {
+            .location-form {
+                margin: 20px;
+                padding: 25px;
+            }
+            .location-btn {
+                padding: 14px 20px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="decorative flower" style="top:10%; left:5%"></div>
+    <div class="decorative cloud" style="top:20%; left:-10%"></div>
+    <div class="decorative star" style="top:15%; right:10%"></div>
+    <div class="decorative flower" style="top:80%; right:5%"></div>
+    <div class="decorative cloud" style="top:70%; right:-10%"></div>
+
+    <div class="container">
+        <div class="loader" id="loader"></div>
+
+        <div class="location-form" id="locationForm" style="display: none;">
+            <h1>🌍 Выберите локацию</h1>
+            <div class="location-options">
+                <button class="location-btn" onclick="detectLocation()">
+                    📍 Автоматическое определение
+                </button>
+                
+                <div class="divider">
+                    <span class="divider-text">или</span>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" 
+                           class="location-input" 
+                           id="locationInput" 
+                           placeholder="Введите город или адрес">
+                </div>
+                
+                <button class="location-btn" onclick="getManualLocation()">
+                    🔍 Поиск по названию
+                </button>
+            </div>
+            <p id="errorMessage">Локация не найдена</p>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="sun-animation"></div>
+            <div class="info-card">
+                <h2>🌅 Восход: <span id="sunrise"></span></h2>
+                <h2>🌇 Закат: <span id="sunset"></span></h2>
+                <h2>⏳ Длительность дня: <span id="dayLength"></span></h2>
+                <button class="change-location location-btn" onclick="changeLocation()" style="margin-top: 20px;">
+                    🌐 Сменить локацию
+                </button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        window.onload = async () => {
+            const savedCoords = localStorage.getItem('sunCoordinates');
+            if (savedCoords) {
+                await showMainWithData(JSON.parse(savedCoords));
+            } else {
+                document.getElementById('loader').style.display = 'none';
+                showLocationForm();
+            }
+        };
+
+        async function showMainWithData(coords) {
+            showMainContent();
+            await getSunData(coords);
+        }
+
+        async function detectLocation() {
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('locationForm').style.display = 'none';
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async position => {
+                        const coords = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        localStorage.setItem('sunCoordinates', JSON.stringify(coords));
+                        await showMainWithData(coords);
+                    },
+                    async error => {
+                        document.getElementById('loader').style.display = 'none';
+                        showLocationForm();
+                    }
+                );
+            } else {
+                showLocationForm();
+            }
+        }
+
+        async function getManualLocation() {
+            const location = document.getElementById('locationInput').value;
+            document.getElementById('errorMessage').style.display = 'none';
+            
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
+                );
+                const data = await response.json();
+                
+                if (data.length > 0) {
+                    const coords = { 
+                        lat: parseFloat(data[0].lat), 
+                        lng: parseFloat(data[0].lon) 
+                    };
+                    localStorage.setItem('sunCoordinates', JSON.stringify(coords));
+                    await showMainWithData(coords);
+                } else {
+                    document.getElementById('errorMessage').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Ошибка геокодирования:', error);
+            }
+        }
+
+        async function getSunData(coords) {
+            try {
+                const response = await fetch(
+                    `https://api.sunrise-sunset.org/json?lat=${coords.lat}&lng=${coords.lng}&formatted=0`
+                );
+                const data = await response.json();
+                
+                if (data.status === 'OK') {
+                    const formatTime = date => new Date(date).toLocaleTimeString([], { 
+                        hour: '2-digit', 
+                        minute: '2-digit'
+                    });
+                    
+                    const totalSeconds = data.results.day_length;
+                    const hours = Math.floor(totalSeconds / 3600);
+                    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+                    document.getElementById('sunrise').textContent = formatTime(data.results.sunrise);
+                    document.getElementById('sunset').textContent = formatTime(data.results.sunset);
+                    document.getElementById('dayLength').textContent = `${hours}ч ${minutes}мин`;
+                }
+            } catch (error) {
+                console.error('Ошибка получения данных:', error);
+            }
+        }
+
+        function showLocationForm() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('locationForm').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+        }
+
+        function showMainContent() {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('locationForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+        function changeLocation() {
+            localStorage.removeItem('sunCoordinates');
+            document.getElementById('locationInput').value = '';
+            document.getElementById('errorMessage').style.display = 'none';
+            showLocationForm();
+        }
+    </script>
+</body>
+</html>
